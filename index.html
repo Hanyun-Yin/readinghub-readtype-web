@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>你是哪种读书人？</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      background: #F2EDE5;
+      color: #1A1612;
+    }
+    #app {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+    }
+
+    /* ── 通用 ── */
+    .brand-badge {
+      font-size: 13px;
+      font-weight: 600;
+      color: #2B5F5A;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    /* ── 开始页 ── */
+    .intro-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 28px 60px;
+      text-align: center;
+    }
+    .intro-title {
+      font-size: 32px;
+      font-size: clamp(28px, calc(24px + 2vw), 38px);
+      font-weight: 800;
+      color: #1A1612;
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+    .intro-sub {
+      font-size: 15px;
+      color: #6B5F52;
+      line-height: 1.7;
+      white-space: pre-line;
+      margin-bottom: 30px;
+    }
+    .intro-axes {
+      width: 100%;
+      max-width: 340px;
+      margin-bottom: 36px;
+    }
+    .axis-preview {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #E6DDD2;
+    }
+    .axis-preview:last-child { border-bottom: none; }
+    .axis-char {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .axis-char.left { color: #2B5F5A; }
+    .axis-char.right { color: #C9A84C; }
+    .axis-vs {
+      font-size: 12px;
+      color: #C4B8A8;
+      font-weight: 500;
+    }
+    .start-btn {
+      display: block;
+      width: 100%;
+      max-width: 280px;
+      padding: 16px 0;
+      border: none;
+      border-radius: 12px;
+      background: #2B5F5A;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .start-btn:active { opacity: 0.85; }
+    .intro-note {
+      margin-top: 16px;
+      font-size: 12px;
+      color: #C4B8A8;
+    }
+
+    /* ── 答题页 ── */
+    .quiz-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 24px 40px;
+      max-width: 480px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .progress-bar {
+      height: 6px;
+      background: #E6DDD2;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #2B5F5A;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+    .progress-text {
+      font-size: 13px;
+      color: #A09585;
+      text-align: right;
+      margin-bottom: 24px;
+      font-variant-numeric: tabular-nums;
+    }
+    .axis-tag {
+      font-size: 13px;
+      color: #C9A84C;
+      font-weight: 600;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .quiz-prompt {
+      font-size: 22px;
+      font-size: clamp(20px, calc(18px + 1vw), 26px);
+      font-weight: 700;
+      color: #1A1612;
+      text-align: center;
+      margin-bottom: 32px;
+      line-height: 1.4;
+    }
+    .option-btn {
+      display: block;
+      width: 100%;
+      padding: 20px 18px;
+      margin-bottom: 14px;
+      border: 2px solid #E6DDD2;
+      border-radius: 12px;
+      background: #FDFAF8;
+      color: #1A1612;
+      font-size: 16px;
+      line-height: 1.6;
+      text-align: left;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .option-btn:active {
+      border-color: #2B5F5A;
+      background: #EFF5F4;
+    }
+
+    /* ── 结果页 ── */
+    .result-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 20px 60px;
+    }
+    .result-card {
+      width: 100%;
+      max-width: 380px;
+      background: #FDFAF8;
+      border: 1px solid #E6DDD2;
+      border-radius: 16px;
+      padding: 28px 22px 24px;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(43, 95, 90, 0.08);
+    }
+    .result-icon {
+      font-size: 56px;
+      margin-bottom: 8px;
+    }
+    .result-code {
+      font-size: 20px;
+      font-weight: 800;
+      color: #2B5F5A;
+      letter-spacing: 4px;
+      margin-bottom: 6px;
+    }
+    .result-title {
+      font-size: 28px;
+      font-size: clamp(24px, calc(22px + 1vw), 32px);
+      font-weight: 800;
+      color: #1A1612;
+      margin-bottom: 10px;
+    }
+    .result-brief {
+      font-size: 14px;
+      color: #6B5F52;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .result-vibe {
+      font-size: 15px;
+      color: #6B5F52;
+      line-height: 1.8;
+      padding: 14px 16px;
+      background: #F2EDE5;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    .axes-chart {
+      margin-bottom: 10px;
+    }
+    .axis-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .axis-row > * + * { margin-left: 8px; }
+    .ax-label {
+      font-size: 12px;
+      font-weight: 600;
+      width: 72px;
+      flex-shrink: 0;
+    }
+    .ax-label.left { text-align: right; color: #2B5F5A; }
+    .ax-label.right { text-align: left; color: #C9A84C; }
+    .ax-bar {
+      flex: 1;
+      height: 14px;
+      background: #E6DDD2;
+      border-radius: 7px;
+      position: relative;
+      overflow: hidden;
+    }
+    .ax-fill {
+      height: 100%;
+      border-radius: 7px;
+      background: #C9A84C;
+      transition: width 0.4s ease;
+      min-width: 14px;
+    }
+    .ax-fill.strong { background: #2B5F5A; }
+    .ax-mid {
+      position: absolute;
+      left: 50%;
+      top: -1px;
+      bottom: -1px;
+      width: 2px;
+      background: rgba(26, 22, 18, 0.15);
+      transform: translateX(-50%);
+    }
+    .result-brand {
+      font-size: 12px;
+      color: #C4B8A8;
+      margin-top: 14px;
+      letter-spacing: 1px;
+    }
+
+    .result-actions {
+      display: flex;
+      margin-top: 20px;
+      width: 100%;
+      max-width: 380px;
+    }
+    .result-actions > * + * { margin-left: 10px; }
+    .post-btn, .save-btn, .retry-btn {
+      flex: 1;
+      padding: 14px 4px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      border: none;
+      white-space: nowrap;
+    }
+    .post-btn {
+      background: #2B5F5A;
+      color: #fff;
+      box-shadow: 0 3px 12px rgba(43, 95, 90, 0.25);
+    }
+    .post-btn:active { opacity: 0.85; }
+    .save-btn {
+      background: #C9A84C;
+      color: #1A1612;
+    }
+    .save-btn:active { opacity: 0.85; }
+    .retry-btn {
+      background: transparent;
+      color: #6B5F52;
+      border: 2px solid #E6DDD2;
+      flex: 0.6;
+    }
+    .retry-btn:active { background: #EFF5F4; }
+
+    .result-tip {
+      margin-top: 14px;
+      font-size: 13px;
+      color: #A09585;
+      text-align: center;
+    }
+
+    .canvas-preview {
+      margin-top: 16px;
+      text-align: center;
+      width: 100%;
+      max-width: 380px;
+    }
+    .save-hint {
+      font-size: 13px;
+      color: #A09585;
+      margin-top: 8px;
+    }
+
+    /* 脉冲动画 */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script src="./app.js"></script>
+</body>
+</html>

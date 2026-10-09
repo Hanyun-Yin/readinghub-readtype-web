@@ -1,0 +1,15 @@
+{
+  "version": "2",
+  "envId": "reading-hub-test-d9ec9ie9641f06b",
+  "hosting": [
+    {
+      "id": "readinghub-readtype",
+      "dist": ".",
+      "public": {
+        "index": "index.html",
+        "404": "index.html"
+      },
+      "expires": "7d"
+    }
+  ]
+}
